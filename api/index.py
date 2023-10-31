@@ -14,6 +14,11 @@ def getdata(name):
     datadate = datadatereg.findall(data)
     datacount = datacountreg.findall(data)
     datacount = list(map(int, [0 if i == "No" else i for i in datacount]))
+
+    # 将datadate和datacount按照字典序排序
+    sorted_data = sorted(zip(datadate, datacount))
+    datadate, datacount = zip(*sorted_data)
+    
     contributions = sum(datacount)
     datalist = []
     for index, item in enumerate(datadate):
