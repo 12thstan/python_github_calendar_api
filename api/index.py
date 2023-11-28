@@ -6,19 +6,25 @@ import json
 
 def list_split(items, n):
     return [items[i:i + n] for i in range(0, len(items), n)]
-
 def getdata(name):
     gitpage = requests.get("https://github.com/" + name)
-    data = re.findall('data-date="(.*?)" data-level="\d+" rx="\d+" ry="\d+">(.*?) contribution',
-                      gitpage.text)
-    datalist = [{"date": _[0], "count": 0 if _[1] == 'No' else int(_[1])} for _ in data]
+    data = gitpage.text
+    datadatereg = re.compile(r'data-date="(.*?)" data-level')
+    datacountreg = re.compile(r'<span class="sr-only">(.*?) contribution')
+    datadate = datadatereg.findall(data)
+    datacount = datacountreg.findall(data)
+    datacount = list(map(int, [0 if i == "No" else i for i in datacount]))
+    contributions = sum(datacount)
+    datalist = []
+    for index, item in enumerate(datadate):
+        itemlist = {"date": item, "count": datacount[index]}
+        datalist.append(itemlist)
     datalistsplit = list_split(datalist, 7)
     returndata = {
-        "total": sum([_["count"] for _ in datalist]),
+        "total": contributions,
         "contributions": datalistsplit
     }
     return returndata
-
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = self.path
