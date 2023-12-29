@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 import requests
 import re
-from bs4 import BeautifulSoup
 from http.server import BaseHTTPRequestHandler
 import json
 
@@ -9,28 +8,29 @@ def list_split(items, n):
     return [items[i:i + n] for i in range(0, len(items), n)]
 def getdata(name):
     gitpage = requests.get("https://github.com/" + name)
-    soup = BeautifulSoup(gitpage.text,'html.parser')
-    data_list = soup.find_all(class_ = "ContributionCalendar-day")
-    data_set = []
-    length = len(data_list)-5 # 有五个格子是 最后的标尺
-    # 定义正则：
-    contri_reg = re.compile(r'(.*?) contribution[s]* on')
-    contributions = 0
-    for idx in range(length):
-        data_date = data_list[idx]["data-date"]
-        data_contri = contri_reg.findall(data_list[idx].text)
-        data_contri = int(data_contri[0]) if data_contri[0] != 'No' else 0
-        contributions = contributions+data_contri
-        data_set.append({"date":data_date,"count":data_contri})
+    data = gitpage.text
+    
+    datacountreg = re.compile(r'<tool-tip .*?class="sr-only position-absolute">(.*?) contribution')
+    
+    datadate = datadatereg.findall(data)
+    datacount = datacountreg.findall(data)
+    datacount = list(map(int, [0 if i == "No" else i for i in datacount]))
 
-    d_set = list_split(data_set, 7)
-    return {
+    # 将datadate和datacount按照字典序排序
+    sorted_data = sorted(zip(datadate, datacount))
+    datadate, datacount = zip(*sorted_data)
+    
+    contributions = sum(datacount)
+    datalist = []
+    for index, item in enumerate(datadate):
+        itemlist = {"date": item, "count": datacount[index]}
+        datalist.append(itemlist)
+    datalistsplit = list_split(datalist, 7)
+    returndata = {
         "total": contributions,
-        "contributions": d_set
+        "contributions": datalistsplit
     }
-
-
-
+    return returndata
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = self.path
