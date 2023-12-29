@@ -19,10 +19,6 @@ def getdata(name):
     datacount = datacountreg.findall(data)
     datacount = list(map(int, [0 if i == "No" else i for i in datacount]))
 
-    # 新增
-    if not datadate or not datacount:
-        return {"total": 0, "contributions": []}
-
     # 将datadate和datacount按照字典序排序
     sorted_data = sorted(zip(datadate, datacount))
     datadate, datacount = zip(*sorted_data)
