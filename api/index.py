@@ -13,7 +13,7 @@ def getdata(name):
     # 修改 https://github.com/Zfour/python_github_calendar_api/issues/18
     # datadatereg = re.compile(r'data-date="(.*?)" data-level')
     # datacountreg = re.compile(r'<span class="sr-only">(.*?) contribution')
-    datadatereg = re.compile(r'data-date="(.*?)" id="contribution-day-compent"')
+    datadatereg = re.compile(r'data-date="(.*?)" id="contribution-day-component"')
     datacountreg = re.compile(r'<tool-tip .*?class="sr-only position-absolute">(.*?) contribution')
     
     datadate = datadatereg.findall(data)
